@@ -52,6 +52,7 @@ const SAME_SENSOR: &[(&str, &str, &str)] = &[
     ("Fujifilm", "X100V", "X-T3"),
     ("Fujifilm", "X-S10", "X-T3"),
     ("Fujifilm", "X-E4", "X-T3"),
+    ("Fujifilm", "X-S20", "X-T3"),
 ];
 
 /// Model names compared without case, the brand, a leading `EOS` or a trailing `DIGITAL`
@@ -164,6 +165,7 @@ mod tests {
             ("FUJIFILM", "X-T30", "X-T3"),
             ("FUJIFILM", "X-T30 II", "X-T3"),
             ("FUJIFILM", "X100V", "X-T3"),
+            ("FUJIFILM", "X-S20", "X-T3"),
         ] {
             assert_eq!(find(Some(make), model).map(|c| c.model), Some(row), "{make} {model}");
         }
