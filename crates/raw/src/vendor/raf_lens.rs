@@ -471,6 +471,29 @@ mod tests {
     }
 
     #[test]
+    fn xs20_40mp_scale_table_produces_warp_and_vignette() {
+        let scale = 4643.0 / 9.0;
+        let ifd = Ifd {
+            entries: vec![
+                Entry { tag: DISTORTION, value: table(scale, &KNOTS9, &XT4_DIST), offset: 0 },
+                Entry { tag: VIGNETTING, value: table(scale, &KNOTS9, &XT4_VIG), offset: 0 },
+            ],
+            ..Default::default()
+        };
+        // X-S20 on its uncropped 26 MP sensor emits both WarpRectilinear and FixVignetteRadial
+        let ops = corrections("X-S20", &ifd, XT4_AREA);
+        let [Opcode::WarpRectilinear { planes, center: wc }, Opcode::FixVignetteRadial { k, center: vc }] =
+            ops.as_slice()
+        else {
+            panic!("expected warp and vignette for X-S20: {ops:?}");
+        };
+        assert_eq!((*wc, *vc), ([0.5, 0.5], [0.5, 0.5]));
+        assert_eq!(planes.len(), 1);
+        assert!((planes[0][0] - 1.03).abs() < 0.02);
+        assert!((k[0]).abs() > 0.0);
+    }
+
+    #[test]
     fn a_vignette_table_works_without_a_distortion_table() {
         let scale = 3749.0 / 9.0;
         let v = corrections("X-T4", &only(VIGNETTING, table(scale, &KNOTS9, &XT4_VIG)), XT4_AREA);
